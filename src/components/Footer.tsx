@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 export default function Footer() {
   const location = useLocation();
@@ -9,12 +9,14 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-center text-center md:text-left">
           <div>
-             <img 
-              src="https://psg.mgd-crm.com/wp-content/uploads/2023/05/PSG-LOGO-300x169.png" 
-              alt="PSG Logo" 
-              className="h-16 w-auto mx-auto md:mx-0 brightness-0 invert"
-              referrerPolicy="no-referrer"
-            />
+            <Link to="/">
+              <img 
+                src="https://protectionsecuritygroup.com/img/Logo-Blanc-2.png" 
+                alt="PSG Logo" 
+                className="h-24 w-auto mx-auto md:mx-0"
+                referrerPolicy="no-referrer"
+              />
+            </Link>
             <p className="mt-4 text-gray-400 text-sm">
               Providing dependable, professional comprehensive protection and security services.
             </p>

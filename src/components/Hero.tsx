@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const slides = [
   {
     id: 1,
-    image: 'https://psg.mgd-crm.com/wp-content/uploads/2023/05/PSG-SLIDER-1.jpg',
+    image: 'https://protectionsecuritygroup.com/img/home-image-1.jpg',
     title: 'WE PROVIDE SOLUTIONS',
     subtitle: 'NOT ONLY SECURITY SERVICES',
     extra: 'CUSTOM PROGRAMS DESIGNED FOR SPECIFIC NEEDS',
@@ -15,7 +15,7 @@ const slides = [
   },
   {
     id: 2,
-    image: 'https://psg.mgd-crm.com/wp-content/uploads/2023/05/PSG-SLIDER-2.jpg',
+    image: 'https://protectionsecuritygroup.com/img/home-image-2.jpg',
     title: 'EXCEEDING YOUR EXPECTATIONS',
     subtitle: 'IS OUR MISSION',
     buttonText: 'CONTACT US',

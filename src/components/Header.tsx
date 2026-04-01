@@ -1,4 +1,5 @@
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
@@ -6,15 +7,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
-            <img 
-              src="https://psg.mgd-crm.com/wp-content/uploads/2023/05/PSG-LOGO-300x169.png" 
-              alt="Protection Security Group LLC" 
-              className="h-24 w-auto"
-              referrerPolicy="no-referrer"
-            />
-            <h1 className="text-xl font-bold text-gray-900 hidden sm:block">
-              PROTECTION SECURITY GROUP LLC
-            </h1>
+            <Link to="/">
+              <img 
+                src="https://protectionsecuritygroup.com/img/Logo-psg.png" 
+                alt="Protection Security Group LLC" 
+                className="h-24 w-auto"
+                referrerPolicy="no-referrer"
+              />
+            </Link>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-6 text-sm">

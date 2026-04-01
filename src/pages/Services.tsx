@@ -62,7 +62,7 @@ export default function Services() {
               >
                 <div className="lg:w-1/3 relative min-h-[300px]">
                   <img 
-                    src={`https://picsum.photos/seed/${service.id}/800/600`} 
+                    src={`https://protectionsecuritygroup.com/img/${service.id}.jpg`} 
                     alt={service.title} 
                     className="absolute inset-0 w-full h-full object-cover"
                     referrerPolicy="no-referrer"
