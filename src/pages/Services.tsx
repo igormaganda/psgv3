@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { SERVICES } from '../constants';
 import { Shield, ChevronRight } from 'lucide-react';
@@ -78,14 +78,17 @@ export default function Services() {
                       {service.title}
                     </h3>
                   </div>
-                  <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8 whitespace-pre-line">
                     {service.description}
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <button className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold tracking-widest hover:bg-blue-600 transition-colors flex items-center gap-2 group">
+                    <Link 
+                      to="/contact"
+                      className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold tracking-widest hover:bg-blue-600 transition-colors flex items-center gap-2 group"
+                    >
                       REQUEST INFO
                       <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
