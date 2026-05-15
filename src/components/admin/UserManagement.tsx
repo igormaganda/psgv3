@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Search, Plus, Edit, Trash2, Filter, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Filter, ChevronLeft, ChevronRight, User as UserIcon, X, Eye } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
 import { useToast } from '../ui/useToast';
 import { usePagination, useDebounce } from '../../lib/hooks';
 import { ExportButton } from '../ui/ExportButton';
+import ProfileManagement from './ProfileManagement';
 
 interface User {
   id: string;
@@ -18,8 +19,10 @@ interface User {
     employeeId: string;
     firstName?: string;
     lastName?: string;
+    preferredName?: string;
     jobTitle?: string;
     department?: string;
+    photoUrl?: string;
   };
 }
 
@@ -44,6 +47,7 @@ export default function UserManagement() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -58,10 +62,11 @@ export default function UserManagement() {
       department: ''
     }
   });
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
 
   const debouncedSearch = useDebounce(search, 300);
-  const { toast } = useToast();
   const pagination = usePagination(1, 10);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -213,6 +218,11 @@ export default function UserManagement() {
     setShowDeleteDialog(true);
   };
 
+  const openProfileModal = (user: User) => {
+    setSelectedUser(user);
+    setShowProfileModal(true);
+  };
+
   const resetForm = () => {
     setFormData({
       email: '',
@@ -263,7 +273,7 @@ export default function UserManagement() {
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <Input
@@ -301,6 +311,14 @@ export default function UserManagement() {
             <option value="false">Inactive</option>
           </select>
 
+          <Button
+            variant="outline"
+            onClick={() => setViewMode(viewMode === 'table' ? 'grid' : 'table')}
+            className="flex items-center gap-2"
+          >
+            {viewMode === 'table' ? 'Grid View' : 'Table View'}
+          </Button>
+
           {(debouncedSearch || roleFilter || statusFilter) && (
             <Button
               variant="outline"
@@ -319,428 +337,95 @@ export default function UserManagement() {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      {/* Users Display */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : users.length === 0 ? (
           <div className="text-center py-12 text-slate-500">
+            <UserIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p className="text-lg font-medium">No users found</p>
             <p className="text-sm mt-1">Try adjusting your filters or add a new user</p>
           </div>
+        ) : viewMode === 'table' ? (
+          <TableView
+            users={users}
+            onEdit={openEditDialog}
+            onDelete={openDeleteDialog}
+            onViewProfile={openProfileModal}
+          />
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                      Department
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50 transition">
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="font-medium text-slate-900">
-                            {user.profile?.firstName && user.profile?.lastName
-                              ? `${user.profile.firstName} ${user.profile.lastName}`
-                              : user.email}
-                          </p>
-                          <p className="text-sm text-slate-600">{user.email}</p>
-                          {user.profile?.employeeId && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              ID: {user.profile.employeeId}
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant={user.role === 'admin' ? 'admin' : 'employee'}>
-                          {user.role}
-                        </Badge>
-                      </td>
-                                                      <td className="px-6 py-4">
-                        <Badge variant={user.active ? 'success' : 'error'}>
-                          {user.active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 text-slate-700">
-                        {user.profile?.department || '-'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openEditDialog(user)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => openDeleteDialog(user)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <GridView
+            users={users}
+            onEdit={openEditDialog}
+            onDelete={openDeleteDialog}
+            onViewProfile={openProfileModal}
+          />
+        )}
 
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-                <p className="text-sm text-slate-600">
-                  Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                  {pagination.total} users
-                </p>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={pagination.prevPage}
-                    disabled={!pagination.canGoPrev}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Previous
-                  </Button>
-                  <span className="px-3 py-1 text-sm text-slate-700">
-                    Page {pagination.page} of {pagination.totalPages}
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={pagination.nextPage}
-                    disabled={!pagination.canGoNext}
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-4">
+            <p className="text-sm text-slate-600">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+              {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+              {pagination.total} users
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={pagination.prevPage}
+                disabled={!pagination.canGoPrev}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              <span className="px-3 py-1 text-sm text-slate-700">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={pagination.nextPage}
+                disabled={!pagination.canGoNext}
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Create User Dialog */}
       {showCreateDialog && (
-        <Dialog
+        <UserDialog
           title="Create New User"
-          onClose={() => setShowCreateDialog(false)}
-        >
-          <form onSubmit={handleCreateUser} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  First Name
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.firstName}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, firstName: e.target.value }
-                  })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Last Name
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.lastName}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, lastName: e.target.value }
-                  })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email Address
-              </label>
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Password
-              </label>
-              <Input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                placeholder="Min 8 chars, uppercase, lowercase, number"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                  required
-                >
-                  <option value="employee">Employee</option>
-                  <option value="admin">Administrator</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Department
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.department}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, department: e.target.value }
-                  })}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Employee ID
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.employeeId}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, employeeId: e.target.value }
-                  })}
-                  placeholder="Auto-generated if empty"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Job Title
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.jobTitle}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, jobTitle: e.target.value }
-                  })}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="active"
-                checked={formData.active}
-                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-4 h-4 text-amber-500 border-slate-300 rounded focus:ring-amber-500"
-              />
-              <label htmlFor="active" className="text-sm text-slate-700">
-                Active account
-              </label>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" className="flex-1">
-                Create User
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCreateDialog(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </Dialog>
+          formData={formData}
+          onChange={setFormData}
+          onSubmit={handleCreateUser}
+          onClose={() => {
+            setShowCreateDialog(false);
+            resetForm();
+          }}
+        />
       )}
 
       {/* Edit User Dialog */}
       {showEditDialog && selectedUser && (
-        <Dialog
+        <UserDialog
           title="Edit User"
+          formData={formData}
+          onChange={setFormData}
+          onSubmit={handleUpdateUser}
           onClose={() => {
             setShowEditDialog(false);
             setSelectedUser(null);
           }}
-        >
-          <form onSubmit={handleUpdateUser} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  First Name
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.firstName}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, firstName: e.target.value }
-                  })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Last Name
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.lastName}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, lastName: e.target.value }
-                  })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email Address
-              </label>
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Role
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
-                  required
-                >
-                  <option value="employee">Employee</option>
-                  <option value="admin">Administrator</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Department
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.department}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, department: e.target.value }
-                  })}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Employee ID
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.employeeId}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, employeeId: e.target.value }
-                  })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Job Title
-                </label>
-                <Input
-                  type="text"
-                  value={formData.profile.jobTitle}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    profile: { ...formData.profile, jobTitle: e.target.value }
-                  })}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="edit-active"
-                checked={formData.active}
-                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-4 h-4 text-amber-500 border-slate-300 rounded focus:ring-amber-500"
-              />
-              <label htmlFor="edit-active" className="text-sm text-slate-700">
-                Active account
-              </label>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" className="flex-1">
-                Update User
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setShowEditDialog(false);
-                  setSelectedUser(null);
-                }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        </Dialog>
+        />
       )}
 
       {/* Delete Confirmation Dialog */}
@@ -755,18 +440,282 @@ export default function UserManagement() {
           }}
         />
       )}
+
+      {/* Profile Modal */}
+      {showProfileModal && selectedUser && (
+        <ProfileModal
+          user={selectedUser}
+          onClose={() => {
+            setShowProfileModal(false);
+            setSelectedUser(null);
+            fetchUsers();
+          }}
+        />
+      )}
     </div>
   );
 }
 
-// Dialog Component
-interface DialogProps {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
+// Table View Component
+function TableView({ users, onEdit, onDelete, onViewProfile }: {
+  users: User[];
+  onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
+  onViewProfile: (user: User) => void;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-slate-50 border-b border-slate-200">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              User
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Role
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Department
+            </th>
+            <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-200">
+          {users.map((user) => (
+            <tr
+              key={user.id}
+              className="hover:bg-slate-50 transition cursor-pointer"
+              onClick={() => onViewProfile(user)}
+            >
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  {/* Photo */}
+                  <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden flex-shrink-0">
+                    {user.profile?.photoUrl ? (
+                      <img
+                        src={user.profile.photoUrl}
+                        alt={user.profile.firstName || user.email}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-amber-100">
+                        <UserIcon className="w-5 h-5 text-amber-600" />
+                      </div>
+                    )}
+                  </div>
+                  {/* Info */}
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {user.profile?.firstName && user.profile?.lastName
+                        ? `${user.profile.firstName} ${user.profile.lastName}`
+                        : user.email}
+                    </p>
+                    <p className="text-sm text-slate-600">{user.email}</p>
+                    {user.profile?.employeeId && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        ID: {user.profile.employeeId}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <Badge variant={user.role === 'admin' ? 'admin' : 'employee'}>
+                  {user.role}
+                </Badge>
+              </td>
+              <td className="px-6 py-4">
+                <Badge variant={user.active ? 'success' : 'error'}>
+                  {user.active ? 'Active' : 'Inactive'}
+                </Badge>
+              </td>
+              <td className="px-6 py-4 text-slate-700">
+                {user.profile?.department || '-'}
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onEdit(user)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onDelete(user)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-function Dialog({ title, onClose, children }: DialogProps) {
+// Grid View Component
+function GridView({ users, onEdit, onDelete, onViewProfile }: {
+  users: User[];
+  onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
+  onViewProfile: (user: User) => void;
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {users.map((user) => (
+        <motion.div
+          key={user.id}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="border border-slate-200 rounded-lg p-4 hover:shadow-md transition cursor-pointer"
+          onClick={() => onViewProfile(user)}
+        >
+          <div className="flex items-start gap-4">
+            {/* Photo */}
+            <div className="w-16 h-16 rounded-full bg-slate-200 overflow-hidden flex-shrink-0">
+              {user.profile?.photoUrl ? (
+                <img
+                  src={user.profile.photoUrl}
+                  alt={user.profile.firstName || user.email}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-amber-100">
+                  <UserIcon className="w-8 h-8 text-amber-600" />
+                </div>
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-slate-900 truncate">
+                {user.profile?.firstName && user.profile?.lastName
+                  ? `${user.profile.firstName} ${user.profile.lastName}`
+                  : user.email}
+              </p>
+              <p className="text-sm text-slate-600 truncate">{user.email}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant={user.role === 'admin' ? 'admin' : 'employee'}>
+                  {user.role}
+                </Badge>
+                <Badge variant={user.active ? 'success' : 'error'}>
+                  {user.active ? 'Active' : 'Inactive'}
+                </Badge>
+              </div>
+              {user.profile?.department && (
+                <p className="text-xs text-slate-500 mt-1">{user.profile.department}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200" onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={() => onEdit(user)}
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              Edit
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => onDelete(user)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// Profile Modal Component
+function ProfileModal({ user, onClose }: { user: User, onClose: () => void }) {
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('psg_admin_token');
+      const response = await fetch(`/api/admin/profile?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data.profile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">Employee Profile</h3>
+            <p className="text-sm text-slate-600">
+              {user.profile?.firstName && user.profile?.lastName
+                ? `${user.profile.firstName} ${user.profile.lastName}`
+                : user.email}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+          {profile ? (
+            <ProfileManagement
+              userId={user.id}
+              profile={profile}
+              onUpdate={fetchProfile}
+              mode="admin"
+            />
+          ) : (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// User Form Dialog Component
+function UserDialog({ title, formData, onChange, onSubmit, onClose }: any) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <motion.div
@@ -783,23 +732,164 @@ function Dialog({ title, onClose, children }: DialogProps) {
             ✕
           </button>
         </div>
-        <div className="px-6 py-4">
-          {children}
-        </div>
+        <form onSubmit={onSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                First Name
+              </label>
+              <Input
+                type="text"
+                value={formData.profile.firstName}
+                onChange={(e) => onChange({
+                  ...formData,
+                  profile: { ...formData.profile, firstName: e.target.value }
+                })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Last Name
+              </label>
+              <Input
+                type="text"
+                value={formData.profile.lastName}
+                onChange={(e) => onChange({
+                  ...formData,
+                  profile: { ...formData.profile, lastName: e.target.value }
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Email Address
+            </label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) => onChange({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
+
+          {title.includes('Create') && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Password
+              </label>
+              <Input
+                type="password"
+                value={formData.password}
+                onChange={(e) => onChange({ ...formData, password: e.target.value })}
+                required
+                placeholder="Min 8 chars, uppercase, lowercase, number"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Role
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) => onChange({ ...formData, role: e.target.value })}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                required
+              >
+                <option value="employee">Employee</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Department
+              </label>
+              <Input
+                type="text"
+                value={formData.profile.department}
+                onChange={(e) => onChange({
+                  ...formData,
+                  profile: { ...formData.profile, department: e.target.value }
+                })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Employee ID
+              </label>
+              <Input
+                type="text"
+                value={formData.profile.employeeId}
+                onChange={(e) => onChange({
+                  ...formData,
+                  profile: { ...formData.profile, employeeId: e.target.value }
+                })}
+                placeholder="Auto-generated if empty"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Job Title
+              </label>
+              <Input
+                type="text"
+                value={formData.profile.jobTitle}
+                onChange={(e) => onChange({
+                  ...formData,
+                  profile: { ...formData.profile, jobTitle: e.target.value }
+                })}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="active"
+              checked={formData.active}
+              onChange={(e) => onChange({ ...formData, active: e.target.checked })}
+              className="w-4 h-4 text-amber-500 border-slate-300 rounded focus:ring-amber-500"
+            />
+            <label htmlFor="active" className="text-sm text-slate-700">
+              Active account
+            </label>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" className="flex-1">
+              {title.includes('Create') ? 'Create User' : 'Update User'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
       </motion.div>
     </div>
   );
 }
 
-// Delete Confirmation Dialog
-interface DeleteDialogProps {
+// Delete Confirmation Dialog Component
+function DeleteDialog({ title, message, onConfirm, onCancel }: {
   title: string;
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
-}
-
-function DeleteDialog({ title, message, onConfirm, onCancel }: DeleteDialogProps) {
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <motion.div

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Users, FileText, Shield, Activity, Clock, LogOut, AlertCircle, LayoutDashboard } from 'lucide-react';
+import { Users, FileText, Shield, Activity, Clock, LogOut, AlertCircle, LayoutDashboard, Check } from 'lucide-react';
 import UserManagement from '../../components/admin/UserManagement';
 import DocumentManagement from '../../components/admin/DocumentManagement';
+import ChangeRequestApproval from '../../components/admin/ChangeRequestApproval';
 
 interface DashboardStats {
   totalEmployees: number;
@@ -31,7 +32,7 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-type TabType = 'dashboard' | 'users' | 'documents' | 'audit';
+type TabType = 'dashboard' | 'users' | 'documents' | 'audit' | 'approvals';
 
 export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -223,7 +224,8 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                 { key: 'dashboard' as TabType, label: 'Dashboard', icon: LayoutDashboard },
                 { key: 'users' as TabType, label: 'Users', icon: Users },
                 { key: 'documents' as TabType, label: 'Documents', icon: FileText },
-                { key: 'audit' as TabType, label: 'Audit Log', icon: Activity }
+                { key: 'audit' as TabType, label: 'Audit Log', icon: Activity },
+                { key: 'approvals' as TabType, label: 'Approvals', icon: Check }
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -323,6 +325,10 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
 
         {activeTab === 'audit' && (
           <AuditLogView />
+        )}
+
+        {activeTab === 'approvals' && (
+          <ChangeRequestApproval />
         )}
       </main>
     </div>
