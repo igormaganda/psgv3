@@ -30,7 +30,8 @@ export default function Footer() {
             </p>
             <p className="text-sm text-gray-300">
               <span className="block font-bold text-white">Address:</span>
-              41 Union Square West, New York, NY 10003
+              <span className="block">41 Union Square West</span>
+              <span className="block">New York, New York 10003</span>
             </p>
             <p className="text-sm text-gray-300">
               <span className="block font-bold text-white">Email:</span>

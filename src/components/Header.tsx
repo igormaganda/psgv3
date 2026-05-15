@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
-    <header className="bg-white border-b border-gray-100 py-4">
+    <header className="bg-white border-b border-gray-100 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
@@ -11,7 +11,7 @@ export default function Header() {
               <img 
                 src="https://protectionsecuritygroup.com/img/Logo-psg.png" 
                 alt="Protection Security Group LLC" 
-                className="h-24 w-auto"
+                className="h-16 w-auto"
                 referrerPolicy="no-referrer"
               />
             </Link>
@@ -37,7 +37,7 @@ export default function Header() {
               <div>
                 <p className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Address</p>
                 <p className="font-bold text-gray-900">
-                  41 Union Square West, New York, NY 10003
+                  41 Union Square West<br/>New York, New York 10003
                 </p>
               </div>
             </div>

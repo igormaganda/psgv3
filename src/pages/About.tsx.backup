@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Shield, Target, Award, Users, MessageSquare, ClipboardCheck, Briefcase, HeartHandshake, FileCheck, ShieldCheck, ChevronDown } from 'lucide-react';
+import { Shield, Target, Award, Users, MessageSquare, ClipboardCheck, Briefcase, HeartHandshake, FileCheck, ShieldCheck } from 'lucide-react';
 
 export default function About() {
   return (
@@ -16,20 +16,20 @@ export default function About() {
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
-          <motion.h1
+          <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-black mb-6 tracking-tight leading-tight"
+            className="text-5xl md:text-7xl font-black mb-6 tracking-tight"
           >
-            WHAT SETS PROTECTION SECURITY GROUP<br/>AHEAD OF OTHER SECURITY COMPANIES
+            ABOUT <span className="text-blue-600">PSG</span>
           </motion.h1>
-          <motion.p
+          <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="text-xl text-gray-300 max-w-3xl mx-auto font-medium"
           >
-            What sets Protection Security Group LLC<br/>apart from and ahead of other security companies.
+            What sets Protection Security Group LLC apart from and ahead of other security companies.
           </motion.p>
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function About() {
             <div>
               <h2 className="text-blue-600 font-bold tracking-widest text-sm mb-4 uppercase">Our Quality</h2>
               <h3 className="text-4xl font-black text-gray-900 mb-8 leading-tight">
-                A COMPANY IS KNOWN FOR THE QUALITY OF SERVICES IT PRODUCES
+                A COMPANY IS KNOWN FOR THE QUALITY IT PRODUCES
               </h3>
               <p className="text-lg text-gray-600 leading-relaxed mb-12">
                 Protection Security Group LLC’s product is its staff of licensed, trained, and professional Security Officers and Special Event Officers that represent PSG at our clients’ locations and keep our clients, their staff, customers and guests safe and secure.
@@ -73,25 +73,20 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-blue-600 font-bold tracking-widest text-sm mb-4 uppercase">Our Excellence</h2>
-            <h3 className="text-4xl font-black text-gray-900 mb-4">HOW WE OPERATE</h3>
-            <p className="text-lg text-gray-600 flex items-center justify-center gap-2 mt-6">
-              <ChevronDown className="w-5 h-5 animate-bounce" />
-              Click on any section below to learn more
-              <ChevronDown className="w-5 h-5 animate-bounce" />
-            </p>
+            <h3 className="text-4xl font-black text-gray-900">HOW WE OPERATE</h3>
           </div>
 
-          <AccordionContainer />
+          <TabsContainer />
         </div>
       </section>
     </div>
   );
 }
 
-function AccordionContainer() {
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+function TabsContainer() {
+  const [activeTab, setActiveTab] = useState(0);
 
-  const sections = [
+  const tabs = [
     {
       id: 'selection',
       title: 'STAFF SELECTION',
@@ -279,42 +274,57 @@ function AccordionContainer() {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      {sections.map((section) => (
-        <div key={section.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="flex flex-col lg:flex-row gap-12">
+      {/* Tab Buttons */}
+      <div className="lg:w-1/3 flex flex-col gap-2">
+        {tabs.map((tab, index) => (
           <button
-            onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
-            className="w-full flex items-center gap-4 p-6 text-left hover:bg-blue-50 transition-colors duration-200"
+            key={tab.id}
+            onClick={() => setActiveTab(index)}
+            className={`flex items-center gap-4 p-6 rounded-2xl transition-all duration-300 text-left group ${
+              activeTab === index
+                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20'
+                : 'bg-white text-gray-600 hover:bg-blue-50 border border-gray-100'
+            }`}
           >
-            <div className="bg-blue-600 text-white p-3 rounded-xl flex-shrink-0">
-              <section.icon className="w-6 h-6" />
+            <div className={`p-3 rounded-xl transition-colors ${
+              activeTab === index ? 'bg-white/20' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
+            }`}>
+              <tab.icon className="w-6 h-6" />
             </div>
-            <span className="font-bold text-xl text-gray-900 tracking-tight flex-grow">
-              {section.title}
-            </span>
-            <ChevronDown
-              className={`w-6 h-6 text-blue-600 transition-transform duration-200 flex-shrink-0 ${
-                activeSection === section.id ? 'transform rotate-180' : ''
-              }`}
-            />
+            <span className="font-bold tracking-tight">{tab.title}</span>
           </button>
-          <AnimatePresence>
-            {activeSection === section.id && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="px-6 pb-8 pt-2">
-                  {section.content}
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="lg:w-2/3">
+        <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-gray-100 min-h-[500px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="text-gray-600 text-lg leading-relaxed text-justify"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className="bg-blue-600 text-white p-4 rounded-2xl">
+                  {(() => {
+                    const Icon = tabs[activeTab].icon;
+                    return <Icon className="w-8 h-8" />;
+                  })()}
                 </div>
-              </motion.div>
-            )}
+                <h4 className="text-3xl font-black text-gray-900 uppercase tracking-tight">
+                  {tabs[activeTab].title}
+                </h4>
+              </div>
+              {tabs[activeTab].content}
+            </motion.div>
           </AnimatePresence>
         </div>
-      ))}
+      </div>
     </div>
   );
 }

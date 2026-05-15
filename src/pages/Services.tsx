@@ -61,9 +61,15 @@ export default function Services() {
                 className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col lg:flex-row scroll-mt-24"
               >
                 <div className="lg:w-1/3 relative min-h-[300px]">
-                  <img 
-                    src={`https://protectionsecuritygroup.com/img/${service.id}.jpg`} 
-                    alt={service.title} 
+                  <img
+                    src={
+                      service.id === 'fdny-fire-guards'
+                        ? '/img/fire22.jpg'
+                        : service.id === 'fdny-fire-life-safety-directors'
+                        ? '/img/fire1111.jpg'
+                        : `https://protectionsecuritygroup.com/img/${service.id}.jpg`
+                    }
+                    alt={service.title}
                     className="absolute inset-0 w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
@@ -101,7 +107,7 @@ export default function Services() {
       <section className="py-24 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-8">READY TO SECURE YOUR LOCATION?</h2>
-          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-blue-100 mb-12 max-w-4xl mx-auto font-medium whitespace-nowrap">
             Contact us today for a comprehensive security assessment and custom program design.
           </p>
           <a 

@@ -108,7 +108,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-1">Address</h4>
-                    <p className="text-gray-600 font-medium">41 Union Square West, New York, NY 10003</p>
+                    <p className="text-gray-600 font-medium">41 Union Square West<br/>New York, New York 10003</p>
                   </div>
                 </div>
 
