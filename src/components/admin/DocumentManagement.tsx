@@ -173,7 +173,8 @@ export default function DocumentManagement() {
         <div className="flex gap-3">
           <ExportButton
             filename={`documents-${new Date().toISOString().split('T')[0]}.csv`}
-            apiUrl="/api/admin/export/documents"
+            apiUrl="/api/admin/export"
+            params={{ type: 'documents' }}
           />
           <Button
             onClick={() => {
