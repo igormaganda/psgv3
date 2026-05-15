@@ -1,9 +1,9 @@
 import { X } from 'lucide-react';
-import { useToast } from './useToast';
+import { useToast as useToastContext } from '../../context/ToastContext';
 import { cn } from '../../lib/utils';
 
 export function Toast() {
-  const { toasts, removeToast } = useToast();
+  const { toasts, removeToast } = useToastContext();
 
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
