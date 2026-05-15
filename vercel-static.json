@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "name": "psg3-admin-portal",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ]
+}

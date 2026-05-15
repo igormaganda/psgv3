@@ -4,7 +4,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import authRoutes from "./src/api/auth.js";
+import adminRoutes from "./src/api/admin.js";
 
 dotenv.config();
 
@@ -17,6 +20,14 @@ async function startServer() {
 
   app.use(cors());
   app.use(express.json());
+  app.use(cookieParser());
+
+  // API Routes
+  app.use("/api/auth", authRoutes);
+  app.use("/api/admin", adminRoutes);
+
+  // Serve uploaded files
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
   // API Route for Contact Form
   app.post("/api/contact", async (req, res) => {

@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Protection Security Group - Employee Portal Database Schema
+// Optimisé pour Vercel + PostgreSQL externe
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  passwordHash         String
+  role                 String    @default("employee") // "admin" or "employee"
+  active               Boolean   @default(true)
+  lastPasswordChange   DateTime  @default(now())
+  passwordExpiresAt    DateTime?
+  mustChangePassword   Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  profile              EmployeeProfile?
+  uploadedDocuments    Document[]
+  auditLogs            AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([active])
+}
+
+// Employee Profile with 50+ fields
+model EmployeeProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Identity
+  employeeId           String?   @unique
+  firstName            String
+  lastName             String
+  preferredName        String?
+  dateOfBirth          DateTime?
+  placeOfBirth         String?
+  nationality          String?
+
+  // Contact
+  personalEmail        String?
+  workEmail            String?
+  phone                String?
+  workPhone            String?
+
+  // Address
+  addressLine1         String?
+  addressLine2         String?
+  city                 String?
+  state                String?
+  postalCode           String?
+  country              String?
+
+  // Emergency Contact
+  emergencyContactName     String?
+  emergencyContactRelation String?
+  emergencyContactPhone    String?
+  emergencyContactEmail    String?
+
+  // Government Identification
+  governmentIdType      String?
+  governmentIdNumber    String?
+  ssnLast4             String?
+  workAuthorizationType String?
+  workAuthorizationExpiry DateTime?
+
+  // Professional
+  jobTitle             String?
+  department           String?
+  manager              String?
+  contractType         String? // Permanent/Fixed-Term/Freelance
+  employmentType       String? // Full-Time/Part-Time/Contract/Temporary
+  hireDate             DateTime?
+  probationEndDate     DateTime?
+
+  // Planning
+  workLocation         String?
+  shiftType            String?
+  weeklyHours          Float?
+
+  // Compensation
+  payType              String? // Hourly/Salary
+  basePay              Float?
+  bonusEligible        Boolean   @default(false)
+
+  // Banking
+  bankName             String?
+  bankAccountLast4     String?
+  routingLast4         String?
+
+  // Equipment
+  uniformSize          String?
+  equipmentIssued      String?
+
+  // Certifications
+  licenses             String?
+  certifications       String?
+  trainingRequired     String?
+  performanceRating    Int?
+
+  // Other
+  mfaEnabled           Boolean   @default(false)
+  status               String?
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([employeeId])
+  @@index([firstName, lastName])
+}
+
+// Documents model
+model Document {
+  id                   String    @id @default(cuid())
+  title                String
+  category             String    // Company Policy, Forms, Safety, Training, Benefits, Other
+  description          String?
+  filePath             String
+  fileName             String
+  fileSize             Int?
+  mimeType             String?
+  visibility           String    @default("admin") // "employee" (personal) or "admin" (company)
+  uploaderId           String?
+  uploader             User?     @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([category])
+  @@index([visibility])
+  @@index([uploaderId])
+}
+
+// Audit Log model
+model AuditLog {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action               String    // user.create, user.update, document.upload, login, etc.
+  entityType           String?   // Type of entity affected
+  entityId             String?   // ID of entity affected
+  details              String?
+  ipAddress            String?
+
+  createdAt            DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
