@@ -7,6 +7,10 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
+import AdminPortal from './components/admin/AdminPortal';
+import EmployeePortal from './components/employee/EmployeePortal';
+import { ToastProvider } from './context/ToastContext';
+import { Toast } from './components/ui/Toast';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -18,21 +22,35 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <div className="min-h-screen flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
-        <Header />
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+    <ToastProvider>
+      <Router>
+        <ScrollToTop />
+        <Toast />
+        <Routes>
+        {/* Admin Portal - Admin access only */}
+        <Route path="/portal/admin/*" element={<AdminPortal />} />
+
+        {/* Employee Portal - Employee access */}
+        <Route path="/portal/*" element={<EmployeePortal />} />
+
+        {/* Main Site */}
+        <Route path="*" element={
+          <div className="min-h-screen flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
+            <Header />
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        } />
+      </Routes>
     </Router>
+  </ToastProvider>
   );
 }
