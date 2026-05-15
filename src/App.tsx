@@ -42,7 +42,10 @@ export default function App() {
               <Route path="/employee/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/employee/reset-password" element={<ResetPasswordPage />} />
               <Route path="/employee" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-              <Route path="/employee/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+              <Route
+                path="/employee/admin"
+                element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>}
+              />
             </Routes>
           </main>
           <Footer />

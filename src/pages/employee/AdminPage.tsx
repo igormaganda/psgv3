@@ -11,9 +11,15 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [doc, setDoc] = useState({ title: '', category: 'General', description: '', url: '' });
 
-  const load = () => {
-    fetch('/api/admin/users', { credentials: 'include' }).then(r => r.json()).then(d => setUsers(d.users || []));
-    fetch('/api/admin/documents', { credentials: 'include' }).then(r => r.json()).then(d => setDocuments(d.documents || []));
+  const load = async () => {
+    const [usersRes, docsRes] = await Promise.all([
+      fetch('/api/admin/users', { credentials: 'include' }),
+      fetch('/api/admin/documents', { credentials: 'include' }),
+    ]);
+    const usersData = await usersRes.json();
+    const docsData = await docsRes.json();
+    setUsers(usersData.users || []);
+    setDocuments(docsData.documents || []);
   };
   useEffect(load, []);
 

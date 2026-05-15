@@ -10,7 +10,7 @@ import fs from 'fs/promises';
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+void __filename;
 
 type Role = 'employee' | 'admin';
 interface UserRecord { id: string; email: string; role: Role; passwordHash: string; profile: Record<string, string>; active: boolean; }
@@ -83,7 +83,8 @@ async function startServer() {
     const data = await loadData();
     const user = data.users.find((u) => u.id === s.userId && u.active);
     if (!user) return res.status(401).json({ error: 'Unauthorized' });
-    req.user = user; req.sid = sid; req.data = data;
+    req.user = user;
+    req.sid = sid;
     next();
   };
   const adminOnly = (req: any, res: any, next: any) => req.user.role !== 'admin' ? res.status(403).json({ error: 'Forbidden' }) : next();
