@@ -240,8 +240,9 @@ export default function UserManagement() {
         <div className="flex gap-3">
           <ExportButton
             filename={`users-${new Date().toISOString().split('T')[0]}.csv`}
-            apiUrl="/api/admin/export/users"
+            apiUrl="/api/admin/export"
             params={{
+              type: 'users',
               search: debouncedSearch,
               role: roleFilter,
               status: statusFilter
