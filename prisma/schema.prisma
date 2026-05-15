@@ -30,6 +30,7 @@ model User {
   profile              EmployeeProfile?
   uploadedDocuments    Document[]
   auditLogs            AuditLog[]
+  changeRequests       ProfileChangeRequest[]
 
   @@index([email])
   @@index([role])
@@ -113,6 +114,7 @@ model EmployeeProfile {
   performanceRating    Int?
 
   // Other
+  photoUrl             String?
   mfaEnabled           Boolean   @default(false)
   status               String?
 
@@ -121,6 +123,30 @@ model EmployeeProfile {
 
   @@index([employeeId])
   @@index([firstName, lastName])
+}
+
+// Profile Change Request System
+model ProfileChangeRequest {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  field                String    // Field name being changed
+  oldValue             String?   // Original value
+  newValue             String    // New value requested
+  reason               String?   // Reason for change
+
+  status               String    @default("pending") // pending, approved, rejected
+  reviewedBy           String?   // Admin user ID who reviewed
+  reviewedAt           DateTime?
+  reviewComment        String?
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // Documents model
