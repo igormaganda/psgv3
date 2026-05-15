@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "id": "u-admin",
+      "email": "admin@psg.local",
+      "role": "admin",
+      "passwordHash": "scrypt$cf38922d4fcf37d464402cc97f1c28c9$e7ce19c748466d8c5a24d01062c4b9837d45758035c3732b80ba846dfcce7304b1d51c6738d721a9d0213ae94c4e67f553ff78d732f149633c52e2b377beac16",
+      "active": true,
+      "profile": {
+        "employeeId": "ADM-0001",
+        "firstName": "Isabelle",
+        "lastName": "Durand",
+        "personalEmail": "isabelle.durand@psg.local",
+        "phone": "+1-917-555-0101",
+        "emergencyContactName": "Marc Durand",
+        "emergencyContactPhone": "+1-917-555-0199",
+        "jobTitle": "Directrice des Opérations",
+        "department": "Administration",
+        "manager": "CEO",
+        "contractType": "CDI",
+        "hireDate": "2022-01-10",
+        "status": "active"
+      }
+    },
+    {
+      "id": "u-emp-1",
+      "email": "amelie.martin@psg.local",
+      "role": "employee",
+      "passwordHash": "scrypt$24e77c9ed191f73d10d02005a76a55ac$2f21dbf79f0ece11ffc250f9678a6099e671d170a70c30f6e7c1bc6e5b812879854a4a6e60f04a34ef61d948d318963474145fc5bd51ef55184bf67a5d40b817",
+      "active": true,
+      "profile": {
+        "employeeId": "EMP-1001",
+        "firstName": "Amélie",
+        "lastName": "Martin",
+        "personalEmail": "amelie.martin.personal@example.com",
+        "phone": "+1-646-555-0123",
+        "emergencyContactName": "Julien Martin",
+        "emergencyContactPhone": "+1-646-555-0144",
+        "jobTitle": "Security Supervisor",
+        "department": "Field Operations",
+        "manager": "Isabelle Durand",
+        "contractType": "Full-time",
+        "hireDate": "2023-04-03",
+        "status": "active"
+      }
+    },
+    {
+      "id": "u-emp-2",
+      "email": "nicolas.bernard@psg.local",
+      "role": "employee",
+      "passwordHash": "scrypt$00cd3f97167706af40bbcf01ddcde7bf$5a606cd4c3aa610abac5c186ca6001e937bfa5daf4a534cd74a871a750589a67d60aa29cf5cf6a22d73aac4ff128250de6391d87c1b92aa204174469857b1b07",
+      "active": true,
+      "profile": {
+        "employeeId": "EMP-1002",
+        "firstName": "Nicolas",
+        "lastName": "Bernard",
+        "personalEmail": "nicolas.bernard.personal@example.com",
+        "phone": "+1-718-555-0188",
+        "emergencyContactName": "Claire Bernard",
+        "emergencyContactPhone": "+1-718-555-0166",
+        "jobTitle": "Event Security Officer",
+        "department": "Special Events",
+        "manager": "Amélie Martin",
+        "contractType": "Part-time",
+        "hireDate": "2024-02-19",
+        "status": "active"
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "d1",
+      "title": "Company Handbook",
+      "category": "HR",
+      "description": "Guide employé PSG",
+      "updatedAt": "2026-05-15",
+      "url": "/docs/handbook"
+    },
+    {
+      "id": "d2",
+      "title": "Vacation Request Form",
+      "category": "Forms",
+      "description": "Formulaire de congés",
+      "updatedAt": "2026-05-15",
+      "url": "/docs/vacation-request"
+    }
+  ]
+}

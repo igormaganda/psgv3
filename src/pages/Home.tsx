@@ -3,11 +3,20 @@ import Hero from '../components/Hero';
 import { SERVICES } from '../constants';
 import { Link } from 'react-router-dom';
 import { Shield, CheckCircle, Users, Award } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
+  const { user } = useAuth();
   return (
     <div className="flex flex-col">
       <Hero />
+      {user && (
+        <section className="bg-emerald-50 border-y border-emerald-100 py-5">
+          <div className="max-w-7xl mx-auto px-4">
+            <p className="text-emerald-800 font-semibold">Bienvenue {user.profile.firstName} 👋 Votre espace employé est disponible depuis le menu.</p>
+          </div>
+        </section>
+      )}
       
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
